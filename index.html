@@ -125,6 +125,7 @@
 				</button>
 			</div>
 			<!-- Preset Management Section -->
+			
 			<form id="biomeForm">
 				<!-- Core Biome Information -->
 				<div class="form-group">
@@ -136,12 +137,13 @@
 				</div>
 				<div class="form-group">
 					<label for="identifier" class="required-field">Biome Identifier:</label>
-					<input type="text" id="identifier" placeholder="e.g., mypack:my_custom_biome" required="" value="wanxian:">
+					<input type="text" id="identifier" placeholder="e.g., mypack:my_custom_biome" required="" value="wanxian:custom_land">
 					<div class="tooltip"><span class="material-symbols-rounded">question_mark</span>
 						<span class="tooltiptext">The namespaced name of your biome (e.g., "mypack:my_custom_biome"). Should only be lowercase and unique.</span>
 					</div>
 					<div id="validation" class="error" style="color: var(--md-sys-color-error); display:none; margin-top: 10px;"></div>
 				</div>
+				
 				<h2>Biome Components</h2>
 				<p>Select the components you wish to include in your biome definition.
 				</p>
@@ -160,8 +162,36 @@
     </label>
 </div>
 
-
-
+<div class="component-section single">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+        <h3 style="margin: 0; font-size: 1rem; color: var(--md-sys-color-primary);">Biome Preview</h3>
+        <span class="material-symbols-rounded" style="color: var(--md-sys-color-primary); opacity: 0.7;">landscape</span>
+    </div>
+    
+    <div id="biome-visualizer" class="mc-scene-container">
+        <div class="mc-layer mc-sky"></div>
+        <div class="mc-layer mc-sun"></div>
+        <div class="mc-layer mc-cloud" style="top: 20px; left: 10%; width: 60px;"></div>
+        <div class="mc-layer mc-cloud" style="top: 35px; left: 70%; width: 45px;"></div>
+        
+        <div class="mc-layer mc-hill-bg"></div>
+        
+        <div class="mc-layer mc-ground">
+            <div class="mc-grass-surface"></div>
+        </div>
+        
+        <div class="mc-layer mc-water-puddle"></div>
+        
+        <div class="mc-layer mc-tree" style="left: 15%; bottom: 35px;">
+            <div class="mc-leaves"></div>
+            <div class="mc-trunk"></div>
+        </div>
+        <div class="mc-layer mc-tree" style="left: 80%; bottom: 45px; transform: scale(0.85);">
+            <div class="mc-leaves"></div>
+            <div class="mc-trunk"></div>
+        </div>
+    </div>
+</div>
 				<div class="menu-divider"></div>
 				<!-- Group 1: Climate & Environmental Properties -->
 				
@@ -432,7 +462,7 @@
 				<!-- Component: minecraft:tags -->
 				<div class="component-section start">
 					<h3 class="collapsible-header collapsed" data-target="tags-content">
-						<span class="component-title">tags</span>
+						<span class="component-title">tags & presets</span>
 						<label class="switch">
 						<input type="checkbox" id="enable_tags" class="component-toggle">
 						</label>
@@ -536,10 +566,12 @@
 							</div>
 							<div id="custom_tags_display" class="tag-list"></div>
 						</div>
+						
+						
 						<div id="decoration-presets-section" class="component-section single" style="display: none; margin-bottom: 20px; border: 1px solid var(--md-sys-color-primary);">
     <div style="padding: 16px; display: flex; align-items: center; justify-content: space-between; background: var(--md-sys-color-surface-container-low); border-radius: var(--radius-m);">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <div style="width: 40px; height: 40px; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 40px; height: 40px; flex-shrink: 0; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                 <span class="material-symbols-rounded">forest</span>
             </div>
             <div>
@@ -547,7 +579,7 @@
                 <p id="decoration-active-count" style="margin: 0; font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant);">0 items selected</p>
             </div>
         </div>
-        <button id="btn_manage_decorations" class="m3-btn-filled button" style="height: 36px; padding: 0 16px;">
+        <button type="button" id="btn_manage_decorations" class="m3-btn-filled button" style="height: 36px; padding: 0 16px;">
             <span class="material-symbols-rounded" style="font-size: 18px; margin-right: 8px;">tune</span>
             Manage
         </button>
@@ -1521,7 +1553,7 @@
 					
 <div class="component-section single">
     <h3 class="collapsible-header collapsed" data-target="vibrant_visuals-content">
-        <span class="component-title">vibrant visuals identifiers</span>
+        <span class="component-title">vibrant visuals</span>
         <label class="switch">
             <input type="checkbox" id="comp_vibrant_visuals" class="component-toggle">
             
@@ -2812,83 +2844,157 @@ async function processMultiExport() {
 			    }
 			    
 			    function addReplacementEntry(replacementData = {}) {
-			        const {
-			            dimension = 'minecraft:overworld',
-			            amount = '',
-			            noise_frequency_scale = '',
-			            targets = []
-			        } = replacementData;
-			
-			        const container = document.getElementById('replacements_list_container');
-			        const uniqueId = `replacement_${Date.now()}_${dynamicElementCounter++}_`;
-			        const div = document.createElement('div');
-			        div.classList.add('sub-group', 'dynamic-item');
-			
-			        let optionsHtml = '';
-			        VANILLA_BIOMES.forEach(biome => {
-			            const isSelected = targets.includes(biome);
-			            optionsHtml += `<option value="${biome}" ${isSelected ? 'selected' : ''}>${biome}</option>`;
-			        });
-			
-			        div.innerHTML = `
-			            <h4>Replacement Rule</h4>
-			                                    <div class="form-group">
-                <label class="required-field">Target Dimension:</label>
-                <div class="radio-group">
-                    <label class="radio-container">Overworld
-                        <input type="radio" name="${uniqueId}dimension" value="minecraft:overworld" ${dimension === 'minecraft:overworld' ? 'checked' : ''}>
-                        <span class="radio-checkmark"></span>
-                    </label>
-                    <label class="radio-container">Nether
-                        <input type="radio" name="${uniqueId}dimension" value="minecraft:nether" ${dimension === 'minecraft:nether' ? 'checked' : ''}>
-                        <span class="radio-checkmark"></span>
-                    </label>
-                </div>
-                <div class="tooltip"><span class="material-symbols-rounded">question_mark</span>
-                    <span class="tooltiptext">Dimension in which this replacement can happen. Must be 'minecraft:overworld' or 'minecraft:nether'.</span>
-                </div>
+    const {
+        dimension = 'minecraft:overworld',
+        amount = '',
+        noise_frequency_scale = '',
+        targets = []
+    } = replacementData;
+
+    const container = document.getElementById('replacements_list_container');
+    const uniqueId = `replacement_${Date.now()}_${dynamicElementCounter++}_`;
+    const div = document.createElement('div');
+    div.classList.add('sub-group', 'dynamic-item');
+
+    let optionsHtml = '';
+    VANILLA_BIOMES.forEach(biome => {
+        const isSelected = targets.includes(biome);
+        optionsHtml += `<option value="${biome}" ${isSelected ? 'selected' : ''}>${biome}</option>`;
+    });
+
+    // Handle custom biomes from loaded data that aren't in vanilla list
+    targets.forEach(target => {
+        if (!VANILLA_BIOMES.includes(target)) {
+            optionsHtml += `<option value="${target}" selected>${target}</option>`;
+        }
+    });
+
+    // Define defaults for sliders if empty
+    const defaultAmount = amount !== '' ? amount : 0.7;
+    const defaultScale = noise_frequency_scale !== '' ? noise_frequency_scale : 42.0;
+
+    div.innerHTML = `
+        <h4>Replacement Rule</h4>
+        <div class="form-group">
+            <label class="required-field">Target Dimension:</label>
+            <div class="radio-group">
+                <label class="radio-container">Overworld
+                    <input type="radio" name="${uniqueId}dimension" value="minecraft:overworld" ${dimension === 'minecraft:overworld' ? 'checked' : ''}>
+                    <span class="radio-checkmark"></span>
+                </label>
+                <label class="radio-container">Nether
+                    <input type="radio" name="${uniqueId}dimension" value="minecraft:nether" ${dimension === 'minecraft:nether' ? 'checked' : ''}>
+                    <span class="radio-checkmark"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="${uniqueId}amount" class="required-field">Amount (Float, 0.0 - 1.0]:</label>
+            <input type="number" step="any" min="0.001" max="1.0" id="${uniqueId}amount" value="${defaultAmount}" style="display:none;" required>
+            <div class="custom-slider-replacement" 
+                 data-target-id="${uniqueId}amount" 
+                 data-min-value="0.001" 
+                 data-max-value="1.0" 
+                 data-decimal-places="3" 
+                 data-initial-value="${defaultAmount}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="${uniqueId}noise_freq_scale" class="required-field">Noise Frequency Scale (Float, 0.0 - 100.0]:</label>
+            <input type="number" step="any" min="0.001" max="100.0" id="${uniqueId}noise_freq_scale" value="${defaultScale}" style="display:none;" required>
+            <div class="custom-slider-replacement" 
+                 data-target-id="${uniqueId}noise_freq_scale" 
+                 data-min-value="0.001" 
+                 data-max-value="100.0" 
+                 data-decimal-places="3" 
+                 data-initial-value="${defaultScale}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="${uniqueId}targets_select" class="required-field">Targets (Multi-select Biome Names):</label>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
+                <input type="text" id="${uniqueId}custom_biome" placeholder="namespace:custom_biome" style="margin-bottom: 0; flex-grow: 1;">
+                <button type="button" class="button add-button" id="${uniqueId}add_custom_btn" style="margin: 0; height: 50px;">
+                    <span class="material-symbols-rounded">add</span>
+                </button>
             </div>
 
+            <select id="${uniqueId}targets_select" multiple size="8" required>
+                ${optionsHtml}
+            </select>
+        </div>
+        <button type="button" class="button remove-button">
+            <span class="material-symbols-rounded">remove</span>
+            Remove Replacement
+        </button>
+    `;
+    
+    container.appendChild(div);
 
-			            <div class="form-group">
-			                <label for="${uniqueId}amount" class="required-field">Amount (Float, 0.0 - 1.0]:</label>
-			                <input type="number" step="any" min="0.001" max="1.0" id="${uniqueId}amount" placeholder="e.g., 0.7" value="${amount}" required>
-			                <div class="tooltip"><span class="material-symbols-rounded">question_mark</span>
-			                    <span class="tooltiptext">Noise value, similar to a percentage. Must be in the range (0.0, 1.0].</span>
-			                </div>
-			            </div>
-			            <div class="form-group">
-			                <label for="${uniqueId}noise_freq_scale" class="required-field">Noise Frequency Scale (Float, 0.0 - 100.0]:</label>
-			                <input type="number" step="any" min="0.001" max="100.0" id="${uniqueId}noise_freq_scale" placeholder="e.g., 42" value="${noise_frequency_scale}" required>
-			                <div class="tooltip"><span class="material-symbols-rounded">question_mark</span>
-			                    <span class="tooltiptext">Scaling value for replacement frequency. Must be in the range (0.0, 100.0].</span>
-			                </div>
-			            </div>
-			            <div class="form-group">
-			                <label for="${uniqueId}targets_select" class="required-field">Targets (Multi-select Biome Names):</label>
-			                <select id="${uniqueId}targets_select" multiple size="8" required>
-			                    ${optionsHtml}
-			                </select>
-			                <div class="tooltip"><span class="material-symbols-rounded">question_mark</span>
-			                    <span class="tooltiptext">Biomes that are going to be replaced.</span>
-			                </div>
-			            </div>
-			            <button type="button" class="button remove-button">
-			                <span class="material-symbols-rounded">remove</span>
-			                Remove Replacement
-			            </button>
-			        `;
-			        container.appendChild(div);
-			
-			        div.querySelector('.remove-button').onclick = (e) => e.target.closest('.dynamic-item').remove();
-			        div.querySelectorAll('input[required], select[required]').forEach(input => input.dataset.originalRequired = 'true');
-			            // --- ADDED: Initialize the new multi-select UI immediately ---
+    // 1. Initialize Sliders for this new entry
+    div.querySelectorAll('.custom-slider-replacement').forEach(window.initCustomSlider);
+
+    // 2. Initialize Multi-Select UI
     if (typeof initMultiSelects === 'function') {
         initMultiSelects();
     }
-    // -------------------------------------------------------------
-			        return div;
-			    }
+
+    // 3. Logic for Adding Custom Biomes
+    const addCustomBtn = div.querySelector(`#${uniqueId}add_custom_btn`);
+    const customInput = div.querySelector(`#${uniqueId}custom_biome`);
+    const select = div.querySelector(`#${uniqueId}targets_select`);
+
+    addCustomBtn.addEventListener('click', () => {
+        const val = customInput.value.trim().toLowerCase();
+        
+        // Basic Validation
+        if (!val) {
+            alert("Please enter a biome identifier.");
+            return;
+        }
+        if (!/^[a-z0-9._%+\-]+:[a-z0-9._%+\-]+$/.test(val)) {
+            alert("Invalid format. Use namespace:biome_name.");
+            return;
+        }
+
+        // Check for duplicates
+        let exists = false;
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === val) {
+                exists = true;
+                select.options[i].selected = true; // Just select it if exists
+                break;
+            }
+        }
+
+        if (!exists) {
+            // Add new option and select it
+            const opt = new Option(val, val, true, true);
+            select.add(opt);
+        }
+
+        // Clear input
+        customInput.value = '';
+
+        // INSTANTLY UPDATE THE MULTI-SELECT TRIGGER UI
+        // The trigger is inserted immediately after the select by initMultiSelects
+        const trigger = select.nextSibling; 
+        if (trigger && trigger.classList.contains('m3-select-trigger')) {
+            const textSpan = trigger.querySelector('.selection-text');
+            if (textSpan && typeof updateTriggerText === 'function') {
+                updateTriggerText(select, textSpan);
+            }
+        }
+    });
+
+    div.querySelector('.remove-button').onclick = (e) => e.target.closest('.dynamic-item').remove();
+    div.querySelectorAll('input[required], select[required]').forEach(input => input.dataset.originalRequired = 'true');
+
+    return div;
+}
+
 			
 			    function getBlockSpecifierFromGroup(containerElement) {
 			        const nameInput = containerElement.querySelector('input[id$="name"]');
@@ -4146,7 +4252,7 @@ const dimension = dimensionObj ? dimensionObj.value : "minecraft:overworld";
             <div id="client-biome-content" class="component-content">
                 <div class="menu-divider"></div>
                 
-                <div id="validation" class="error" style="color: var(--md-sys-color-error); display:none; margin-top: 10px;"></div>
+                <div id="validation"></div>
                 <div class="tool-container" style="margin-top: 15px; margin-bottom: 15px;">
                     <div class="tool-management">
                     	<input type="file" id="importClientJsonFile" accept=".json" style="display: none;">
@@ -4165,6 +4271,9 @@ const dimension = dimensionObj ? dimensionObj.value : "minecraft:overworld";
                 </div>
 <pre id="outputJson" class="json-output" style="margin-top: 0;
 height: 250px; overflow: auto;"></pre>
+
+
+
 
                 
 
@@ -5984,121 +6093,118 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 </script>
 <script>
+// Define global initialization function for sliders
+window.initCustomSlider = function(wrapper) {
+    const targetId = wrapper.dataset.targetId;
+    const targetInput = document.getElementById(targetId);
+    if (!targetInput) return;
+
+    const minValue = parseFloat(wrapper.dataset.minValue);
+    const maxValue = parseFloat(wrapper.dataset.maxValue);
+    const decimalPlaces = parseInt(wrapper.dataset.decimalPlaces);
+    
+    // Grab initial value from the hidden input
+    let initialVal = parseFloat(targetInput.value);
+    if (isNaN(initialVal)) initialVal = parseFloat(wrapper.dataset.initialValue);
+
+    // Build HTML
+    wrapper.innerHTML = `
+        <div class="slider-info">
+            <span>Value</span>
+            <span class="slider-val-display">${initialVal.toFixed(decimalPlaces)}</span>
+        </div>
+        <div class="color-bars-container">
+            <div class="color-bar" id="left-bar"></div>
+            <div id="separator-handle"></div>
+            <div class="color-bar" id="right-bar"></div>
+        </div>
+    `;
+
+    const container = wrapper.querySelector('.color-bars-container');
+    const leftBar = wrapper.querySelector('#left-bar');
+    const rightBar = wrapper.querySelector('#right-bar');
+    const displayVal = wrapper.querySelector('.slider-val-display');
+
+    // Update UI Function
+    const updateSliderUI = (val) => {
+        // Clamp value
+        if (val < minValue) val = minValue;
+        if (val > maxValue) val = maxValue;
+
+        const range = maxValue - minValue;
+        const percent = ((val - minValue) / range) * 100;
+
+        leftBar.style.width = `calc((100% - 16px) * ${percent / 100})`; 
+        rightBar.style.width = `calc((100% - 16px) * ${(100 - percent) / 100})`;
+        
+        displayVal.textContent = val.toFixed(decimalPlaces);
+        
+        // Toggle Dot visibility
+        if ((100 - percent) < 5) rightBar.classList.add('hide-dot');
+        else rightBar.classList.remove('hide-dot');
+        
+        // Sync to hidden input
+        targetInput.value = val.toFixed(decimalPlaces);
+    };
+
+    // Attach method to input so other scripts can call it
+    targetInput.updateSliderUI = () => {
+            const v = parseFloat(targetInput.value);
+            if(!isNaN(v)) updateSliderUI(v);
+    };
+
+    // Drag Logic
+    let isDragging = false;
+    const onDrag = (clientX) => {
+        const rect = container.getBoundingClientRect();
+        let x = clientX - rect.left;
+        let percent = x / rect.width;
+        if (percent < 0) percent = 0; 
+        if (percent > 1) percent = 1;
+        
+        const range = maxValue - minValue;
+        const newVal = minValue + (percent * range);
+        updateSliderUI(newVal);
+    };
+
+    const startDrag = (e) => {
+        isDragging = true; 
+        e.preventDefault();
+        document.addEventListener('mousemove', moveDrag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchmove', moveDrag, {passive: false});
+        document.addEventListener('touchend', endDrag);
+    };
+    
+    const moveDrag = (e) => {
+        if(!isDragging) return;
+        const cx = e.touches ? e.touches[0].clientX : e.clientX;
+        onDrag(cx);
+    };
+    
+    const endDrag = () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', moveDrag);
+        document.removeEventListener('mouseup', endDrag);
+        document.removeEventListener('touchmove', moveDrag);
+        document.removeEventListener('touchend', endDrag);
+    };
+
+    const handle = wrapper.querySelector('#separator-handle');
+    handle.addEventListener('mousedown', startDrag);
+    handle.addEventListener('touchstart', startDrag, {passive: false});
+    container.addEventListener('click', (e) => { if(e.target !== handle) onDrag(e.clientX); });
+
+    // Init
+    updateSliderUI(initialVal);
+};
+
+// Initialize static sliders on load
 document.addEventListener('DOMContentLoaded', () => {
-    const sliders = document.querySelectorAll('.custom-slider-replacement');
-
-    sliders.forEach(wrapper => {
-        const targetId = wrapper.dataset.targetId;
-        const targetInput = document.getElementById(targetId);
-        if (!targetInput) return;
-
-        const minValue = parseFloat(wrapper.dataset.minValue);
-        const maxValue = parseFloat(wrapper.dataset.maxValue);
-        const decimalPlaces = parseInt(wrapper.dataset.decimalPlaces);
-        
-        // Grab initial value from the hidden input
-        let initialVal = parseFloat(targetInput.value);
-        if (isNaN(initialVal)) initialVal = parseFloat(wrapper.dataset.initialValue);
-
-        // Build HTML
-        wrapper.innerHTML = `
-            <div class="slider-info">
-                <span>Value</span>
-                <span class="slider-val-display">${initialVal.toFixed(decimalPlaces)}</span>
-            </div>
-            <div class="color-bars-container">
-                <div class="color-bar" id="left-bar"></div>
-                <div id="separator-handle"></div>
-                <div class="color-bar" id="right-bar"></div>
-            </div>
-        `;
-
-        const container = wrapper.querySelector('.color-bars-container');
-        const leftBar = wrapper.querySelector('#left-bar');
-        const rightBar = wrapper.querySelector('#right-bar');
-        const displayVal = wrapper.querySelector('.slider-val-display');
-
-        // Update UI Function
-                const updateSliderUI = (val) => {
-            // Clamp value
-            if (val < minValue) val = minValue;
-            if (val > maxValue) val = maxValue;
-
-            const range = maxValue - minValue;
-            const percent = ((val - minValue) / range) * 100;
-
-            // FIXED: Calculate width proportionally based on available space (100% - 16px handle)
-            // This prevents negative calc() values at 0% which caused the "shrinking" glitch
-            leftBar.style.width = `calc((100% - 16px) * ${percent / 100})`; 
-            rightBar.style.width = `calc((100% - 16px) * ${(100 - percent) / 100})`;
-            
-            displayVal.textContent = val.toFixed(decimalPlaces);
-            
-            // REMOVED: The logic that added 'hide-dot' class has been deleted 
-            // to stop the dot from disappearing.
-            
-            
-            // Toggle Dot visibility
-            if ((100 - percent) < 5) rightBar.classList.add('hide-dot');
-            else rightBar.classList.remove('hide-dot');
-            
-            // Sync to hidden input
-            targetInput.value = val.toFixed(decimalPlaces);
-        };
-
-        // Attach method to input so other scripts can call it
-        targetInput.updateSliderUI = () => {
-             const v = parseFloat(targetInput.value);
-             if(!isNaN(v)) updateSliderUI(v);
-        };
-
-        // Drag Logic
-        let isDragging = false;
-        const onDrag = (clientX) => {
-            const rect = container.getBoundingClientRect();
-            let x = clientX - rect.left;
-            let percent = x / rect.width;
-            if (percent < 0) percent = 0; 
-            if (percent > 1) percent = 1;
-            
-            const range = maxValue - minValue;
-            const newVal = minValue + (percent * range);
-            updateSliderUI(newVal);
-        };
-
-        const startDrag = (e) => {
-            isDragging = true; 
-            e.preventDefault();
-            document.addEventListener('mousemove', moveDrag);
-            document.addEventListener('mouseup', endDrag);
-            document.addEventListener('touchmove', moveDrag, {passive: false});
-            document.addEventListener('touchend', endDrag);
-        };
-        
-        const moveDrag = (e) => {
-            if(!isDragging) return;
-            const cx = e.touches ? e.touches[0].clientX : e.clientX;
-            onDrag(cx);
-        };
-        
-        const endDrag = () => {
-            isDragging = false;
-            document.removeEventListener('mousemove', moveDrag);
-            document.removeEventListener('mouseup', endDrag);
-            document.removeEventListener('touchmove', moveDrag);
-            document.removeEventListener('touchend', endDrag);
-        };
-
-        const handle = wrapper.querySelector('#separator-handle');
-        handle.addEventListener('mousedown', startDrag);
-        handle.addEventListener('touchstart', startDrag, {passive: false});
-        container.addEventListener('click', (e) => { if(e.target !== handle) onDrag(e.clientX); });
-
-        // Init
-        updateSliderUI(initialVal);
-    });
+    document.querySelectorAll('.custom-slider-replacement').forEach(window.initCustomSlider);
 });
 </script>
+
 <script>
 /**
  * FOG SYSTEM LOGIC - COMPLETE & FIXED
@@ -6687,6 +6793,57 @@ window.addDecorationFilesToZip = async function(zipFolder) {
 </script>
 
 
+<script>
+  function initVisualizer() {
+    const container = document.getElementById('biome-visualizer');
+    
+    // Helper to safely get value
+    const getVal = (id, def) => {
+        const el = document.getElementById(id);
+        return el ? (el.value || def) : def;
+    };
 
+    function updatePreview() {
+        if(!container) return;
+
+        // 1. Get Values
+        const sky = getVal('sky_color_hex', '#88AAFF');
+        const water = getVal('water_surface_color', '#4455FF');
+        const waterAlpha = document.getElementById('water_surface_opacity') ? document.getElementById('water_surface_opacity').value : 0.8;
+        const foliage = getVal('foliage_color_hex', '#55AA33');
+        const grass = getVal('grass_color_hex', '#77CC44');
+
+        // 2. Set CSS Variables (The Scene updates automatically via CSS)
+        container.style.setProperty('--viz-sky', sky);
+        container.style.setProperty('--viz-water', water);
+        container.style.setProperty('--viz-water-alpha', waterAlpha);
+        container.style.setProperty('--viz-foliage', foliage);
+        container.style.setProperty('--viz-grass', grass);
+    }
+
+    // 3. Attach Listeners
+    const ids = [
+        'sky_color_hex', 'sky_color_hex_text',
+        'water_surface_color', 'water_surface_color_text', 'water_surface_opacity',
+        'foliage_color_hex', 'foliage_color_hex_text',
+        'grass_color_hex', 'grass_color_hex_text'
+    ];
+
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', updatePreview);
+            el.addEventListener('change', updatePreview);
+        }
+    });
+
+    // Run immediately
+    updatePreview();
+}
+
+// Add to DOM Content Loaded
+document.addEventListener('DOMContentLoaded', initVisualizer);
+  
+</script>
 	</body>
 </html>

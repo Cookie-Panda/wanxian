@@ -766,6 +766,13 @@ input:checked:active + .slider:before {
 }
 
 
+        /* Custom Tag Styling */
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
 
 .tag-item {
   background: var(--md-sys-color-primary-container);
@@ -2280,4 +2287,171 @@ body {
     min-width: 20px;
     text-align: center;
     display: none; /* Hide if 0 */
+}
+
+/* --- Validation Error Card (Tertiary Style) --- */
+#validation {
+  /* Default hidden state */
+  display: none; 
+  
+  /* Layout: Flexbox to align icon and text side-by-side */
+  flex-direction: row;
+  align-items: flex-start; /* Aligns icon with the first line of text */
+  gap: 16px; /* Space between icon and text */
+  
+  /* Spacing */
+  margin-top: 12px;
+  padding: 16px 20px;
+  
+  /* Colors: Tertiary Palette */
+  background-color: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+  
+  /* Shape & Style */
+  border-radius: var(--radius-l);
+  border: 1px solid var(--md-sys-color-tertiary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  
+  /* Typography */
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5; /* Good readability */
+  
+  /* Animation */
+  animation: validationPop 0.3s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+/* FIX: This forces Flexbox even if JS sets display: 'block' */
+#validation[style*="display: block"], 
+#validation[style*="display:block"] {
+  display: flex !important;
+}
+
+/* Icon Styles */
+#validation::before {
+  content: 'error'; 
+  font-family: 'Material Symbols Rounded';
+  font-size: 24px;
+  
+  /* Sizing Fixes: Prevents icon from squishing or moving */
+  min-width: 24px; 
+  height: 24px;
+  line-height: 1;
+  
+  /* Optical Alignment: Align icon perfectly with text baseline */
+  margin-top: -2px; 
+  
+  font-weight: normal;
+  color: inherit;
+  font-variation-settings: 'FILL' 1, 'wght' 400;
+}
+
+@keyframes validationPop {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Minecraft Biome Visualizer Styles (Final Polish) --- */
+.mc-scene-container {
+    --viz-sky: #88AAFF;
+    --viz-grass: #77CC44;
+    --viz-foliage: #55AA33;
+    --viz-water: #4455FF;
+    --env-trunk: #5D4037;
+    --viz-water-alpha: 0.8;
+    
+    height: 180px;
+    width: 100%;
+    border-radius: var(--radius-m);
+    position: relative;
+    overflow: hidden;
+    background-color: var(--viz-sky);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
+}
+
+.mc-layer { position: absolute; }
+
+/* Sun */
+.mc-sun {
+    width: 24px; height: 24px;
+    background: #FFF59D;
+    top: 20px; right: 20px;
+    box-shadow: 0 0 15px rgba(255, 245, 157, 0.8);
+    z-index: 0;
+}
+
+/* Clouds */
+.mc-cloud {
+    height: 12px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    z-index: 1;
+}
+
+/* Background Hills (Restored) */
+.mc-hill-bg {
+    bottom: 20px; left: 0; right: 0; height: 80px;
+    background: var(--viz-grass);
+    opacity: 0.96; /* Faded for distance */
+    border-radius: 50% 50% 0 0 / 25px 25px 0 0; /* Rounded hill shape */
+    transform: scaleX(1.5);
+    z-index: 1;
+}
+
+/* Ground Plane (Flat) */
+.mc-ground {
+    bottom: 0; left: 0; right: 0;
+    height: 40px;
+    z-index: 2; /* In front of hills */
+}
+
+.mc-grass-surface {
+    width: 100%; height: 100%;
+    background: var(--viz-grass);
+    transition: background-color 0.3s;
+    /* Subtle noise texture */
+/*    background-image: radial-gradient(rgba(0,0,0,0.05) 15%, transparent 16%);
+    background-size: 12px 12px;*/
+}
+
+/* Water Patch (Puddle) */
+.mc-water-puddle {
+    bottom: 15px;
+    left: 35%;
+    width: 30%;
+    height: 12px;
+    background: var(--viz-water);
+    opacity: var(--viz-water-alpha);
+    border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+    z-index: 3; /* On top of ground */
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+    transition: background-color 0.3s, opacity 0.3s;
+}
+
+/* Trees */
+.mc-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 4; /* On top of everything */
+/*    filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.1));*/
+}
+
+.mc-leaves {
+    width: 32px; height: 32px;
+    background: var(--viz-foliage);
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    z-index: 2;
+}
+
+.mc-trunk {
+    width: 6px; height: 18px;
+    background: var(--env-trunk);
+    margin-top: -4px;
+    z-index: 1;
 }
